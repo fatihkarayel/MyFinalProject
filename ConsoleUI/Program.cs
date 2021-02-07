@@ -13,18 +13,33 @@ namespace ConsoleUI
         static void Main(string[] args)
         {
             //Burada şimdilik bir newleme yapacağız ama ilerde buradan kurtulacağız 
-            ProductManager productManager = new ProductManager( new EfProductDal());
-            Console.WriteLine("\nCategory Id 2 olanlar");
-            foreach (var product in productManager.GetAllByCategoryId(2))
+            ProductTest();
+            //CategoryTest();
+
+        }
+
+        private static void CategoryTest()
+        {
+            CategoryManager categoryManager = new CategoryManager(new EfCategoryDal());
+            foreach (var category in categoryManager.GetAll())
             {
-                Console.WriteLine(product.ProductName);
+                Console.WriteLine(category.CategoryName);
+            }
+        }
+
+        private static void ProductTest()
+        {
+            ProductManager productManager = new ProductManager(new EfProductDal());
+            Console.WriteLine("\nCategory Id 2 olanlar");
+            foreach (var product in productManager.GetProductDetails())
+            {
+                Console.WriteLine(product.ProductName + " / " + product.CategoryName);
             }
             Console.WriteLine("\nFiyatı 5 ve 10 arasında olanlar");
-            foreach (var product in productManager.GetByUnitPrice(5,20))
+            foreach (var product in productManager.GetByUnitPrice(5, 20))
             {
-                Console.WriteLine(product.ProductName);
+                Console.WriteLine(product.ProductName + " / " + product.CategoryName);
             }
-
         }
     }
 }
