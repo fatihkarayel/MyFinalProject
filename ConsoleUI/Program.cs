@@ -31,15 +31,25 @@ namespace ConsoleUI
         {
             ProductManager productManager = new ProductManager(new EfProductDal());
             Console.WriteLine("\nCategory Id 2 olanlar");
-            foreach (var product in productManager.GetProductDetails())
+            var result = productManager.GetProductDetails();
+
+            if (result.Success==true)
             {
-                Console.WriteLine(product.ProductName + " / " + product.CategoryName);
+                foreach (var product in result.Data)
+                {
+                    Console.WriteLine(product.ProductName + " / " + product.CategoryName);
+                }
             }
-            Console.WriteLine("\nFiyatı 5 ve 10 arasında olanlar");
-            foreach (var product in productManager.GetByUnitPrice(5, 20))
+            else
             {
-                Console.WriteLine(product.ProductName + " / " + product.CategoryName);
+                Console.WriteLine(result.Message);
             }
+            
+            //Console.WriteLine("\nFiyatı 5 ve 10 arasında olanlar");
+            //foreach (var product in productManager.GetByUnitPrice(5, 20))
+            //{
+            //    Console.WriteLine(product.ProductName + " / " + product.CategoryId);
+            //}
         }
     }
 }
