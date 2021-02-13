@@ -9,8 +9,8 @@ namespace Business.Constants
     {//static verince yenilemiyoruz. 
         //injection tekniğiyle çoklu dil desteği sağlanabilir ama burada bırakıyoruz.
         public static string ProductAdded = "Ürün eklendi."; //public olduğu için bu fiedleri büyük harfle verdik. Pr...
-        public static string ProductNameInvalid = "Ürün ismi geçersiz.";
-        public static string MaintenanceTime ="Sistem bakımda";
-        public static string ProductsListed="Ürünler listlendi" ;
+        public static string ProductNameInvalid = "Ürün ismi geçersiz!";
+        public static string MaintenanceTime ="Sistem bakımda!";
+        public static string ProductsListed ="Ürünler listelendi." ;
     }
 }

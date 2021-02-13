@@ -12,6 +12,13 @@ namespace Business.Concrete
 {
     public class ProductManager : IProductService
     {
+        //[logAspect] --AOP
+        //[Validate]
+        //[RemovaCashe]
+        //[Transaction]
+        //[Performance]
+
+        //Autofac çok iyi AOP imkanı sunuyor. Mesela tek başına IoC değil aslında. Eğer sadece IoC yapsaydık .Net in kendi container yapısı yeterli geliyor.
         IProductDal _productDal;
         public ProductManager(IProductDal productDal)
         {
@@ -41,7 +48,7 @@ namespace Business.Concrete
             //İş kodları
             //yetkisi varmı
             //IProductDal productDal = new IProductDal başka bir manager sınıf varsa new lenmez
-            if (DateTime.Now.Hour==22) //22:00 ile 22:59 bakım zamanı
+            if (DateTime.Now.Hour == 1) //22:00 ile 22:59 bakım zamanı
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
             }
