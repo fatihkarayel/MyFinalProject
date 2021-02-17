@@ -34,8 +34,8 @@ namespace WebAPI
 
 
             services.AddControllers();
-            services.AddSingleton<IProductService,ProductManager>();//BANA ARKA PLANDA BÝR REFERANS OLUÞTUR DEMEK. Yani Apide IProductService görürse ProductManager i newliyor. bir tane Product Manager oluþturuyor. Bir milyon tane client bile gelse ayný instance i veriyor. Ama data tutanlarda yapýlmaz. Yani sepet de mesela .herkesin sepeti farklý biri sepetden bir ürün çýkarýrsa herkesden çýkar. veya biri eklerse hepsine eklenir gibi
-            services.AddSingleton<IProductDal, EfProductDal>(); //burada ProductManageri çalýtýrýrken karþýlaþtýðý baþka bir baðýmlýlýðý çözüyoruz.
+            //services.AddSingleton<IProductService,ProductManager>();//BANA ARKA PLANDA BÝR REFERANS OLUÞTUR DEMEK. Yani Apide IProductService görürse ProductManager i newliyor. bir tane Product Manager oluþturuyor. Bir milyon tane client bile gelse ayný instance i veriyor. Ama data tutanlarda yapýlmaz. Yani sepet de mesela .herkesin sepeti farklý biri sepetden bir ürün çýkarýrsa herkesden çýkar. veya biri eklerse hepsine eklenir gibi
+            //services.AddSingleton<IProductDal, EfProductDal>(); //burada ProductManageri çalýtýrýrken karþýlaþtýðý baþka bir baðýmlýlýðý çözüyoruz.
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

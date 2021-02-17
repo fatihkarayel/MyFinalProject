@@ -1,9 +1,13 @@
 ﻿using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
+using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
 using Entities.DTOs;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -25,17 +29,31 @@ namespace Business.Concrete
             _productDal = productDal;
         }
 
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
             //bir bilgilendirme dönmek istiyorum. işlem yapılıp yapılmadı noktasında
             //ama bir metodta sadece bir şey döndürebilsin. farklı şeyler döndürmek istiyorsan encapsulation yapacaksın.
             //business kodlar buraya yazılır
-            if (product.ProductName.Length < 2)
-            {
-                //magic strings 
-                return new ErrorResult(Messages.ProductNameInvalid);
-            }
-            
+            //business kodu ayrı valiadasyon kodunu ayırmak gerekir.
+            //nesnenin yapısal uyumu ile alakalı olan herşey doğrulamadır. Örneğin fiyat sıfırdan büyük olmalıdır veya stok eksi olmamalıdır gibi
+            //
+            //ehliyet alacaksanız ilkyardım, motor sınavından 70 almış mı gibi kontroller business kontrollerdir.
+            //kredi alacak kişinin kredi notuna bakmak business kodu.
+
+            //Validation yapısı oluşturduğumuz için aşağıdaki kısmı sildik. 17/02/2021
+            ////if (product.UnitPrice <=0)
+            ////{
+            ////    return new ErrorResult(Messages.UnitPriceInvalid);
+            ////}
+            ////if (product.ProductName.Length < 2)
+            ////{
+            ////    //magic strings 
+            ////    return new ErrorResult(Messages.ProductNameInvalid);
+            ////}
+
+            //ValidationTool.Validate(new ProductValidator(), product);
+
             _productDal.Add(product); //productDal void kalmaya devam edecek
 
             

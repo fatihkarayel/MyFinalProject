@@ -49,7 +49,7 @@ namespace WebAPI.Controllers
             //kötü kod 1. 
             //return "Merhaba";//buna ulaşmak için localhost:xxxxx/api/products yazılmalı. portu görmek için bu satıra break koy açılan explorer penceresinden görebilirsin
         }
-        [HttpGet("getbyid")]
+        [HttpGet("getbyid")] //https://localhost:44357/api/products/getbyid?id=1 şeklinde çağrılır.
         public IActionResult GetById(int id)
         {
             var result = _productService.GetById(id);
