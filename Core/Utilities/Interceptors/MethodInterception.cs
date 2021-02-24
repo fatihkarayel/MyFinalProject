@@ -5,7 +5,8 @@ namespace Core.Utilities.Interceptors
 {
     public abstract class MethodInterception : MethodInterceptionBaseAttribute
     {
-        protected virtual void OnBefore(IInvocation invocation) { }
+        //invocation: business tarafındaki metodlar. Add çalışınca ass
+        protected virtual void OnBefore(IInvocation invocation) { } //virtual metodlar senin onu ezmeni bekleyen metoddur.
         protected virtual void OnAfter(IInvocation invocation) { }
         protected virtual void OnException(IInvocation invocation, System.Exception e) { }
         protected virtual void OnSuccess(IInvocation invocation) { }

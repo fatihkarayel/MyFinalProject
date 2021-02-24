@@ -1,8 +1,10 @@
 ﻿using Business.Abstract;
+using Business.CCS;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -10,6 +12,7 @@ using Entities.DTOs;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Business.Concrete
@@ -24,12 +27,17 @@ namespace Business.Concrete
 
         //Autofac çok iyi AOP imkanı sunuyor. Mesela tek başına IoC değil aslında. Eğer sadece IoC yapsaydık .Net in kendi container yapısı yeterli geliyor.
         IProductDal _productDal;
-        public ProductManager(IProductDal productDal)
+        //ICategoryDal _categoryDal; //Bir entty manager kendisi hariç başka bir dal'ı enjecte edemez. Am Onun servisini enjecte edebilir.
+        ICategoryService _categoryService;
+
+        public ProductManager(IProductDal productDal, ICategoryService categoryService) 
         {
             _productDal = productDal;
+            _categoryService = categoryService;
+
         }
 
-        [ValidationAspect(typeof(ProductValidator))]
+        //[ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
             //bir bilgilendirme dönmek istiyorum. işlem yapılıp yapılmadı noktasında
@@ -54,11 +62,36 @@ namespace Business.Concrete
 
             //ValidationTool.Validate(new ProductValidator(), product);
 
-            _productDal.Add(product); //productDal void kalmaya devam edecek
+            //örneğin bir categoride max 10 ad. ürün olmalı gibi bir kuralımız varsa o burada yazılır. Interface de yapılmaz. validation da yapılmaz.
+            //validationda ise girilen verinin yapısal olarak uygun olup olmadığı kontrol edilir.
 
-            
-            return new SuccessResult(Messages.ProductAdded);//void yerine IResult yaptım artık return ile bir şey döndürebiliyoruz.
-            
+
+            //aşağıdaki gibi bir iş kuralını böyle yazarsan katmanlı mimarinin bir faydası olmaz. Buralar spagettiye döner. Çünkü bu iş kuralı update metodunda da uygulanması gereken bir kural
+            //var result = _productDal.GetAll(p => p.CategoryId == product.CategoryId).Count;
+            //if (result >= 10)
+            //{
+            //    return new ErrorResult(Messages.ProductCountOfCategoryError);
+            //}
+            IResult result = BusinessRules.Run(CheckIfProductCountOfCategoryCorrect(product.CategoryId), 
+                CheckIfProductNameExists(product.ProductName), CheckIfCategoryLimitExceeded());
+            if(result != null)
+            {
+                return result;
+            }
+            _productDal.Add(product);
+            return new SuccessResult(Messages.ProductAdded);
+
+            //aşağıdaki gibi yapmak yerine yukarıdaki gibi bir business motoruna hepsini gönderebiliyoruz.
+            //if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
+            //{
+            //    if (CheckIfProductNameExists(product.ProductName).Success)
+            //    {
+            //        //business kodlar
+            //        _productDal.Add(product); //productDal void kalmaya devam edecek
+            //        return new SuccessResult(Messages.ProductAdded);//void yerine IResult yaptım artık return ile bir şey döndürebiliyoruz.
+            //    }
+            //}
+            //return new ErrorResult();
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -70,12 +103,12 @@ namespace Business.Concrete
             {
                 return new ErrorDataResult<List<Product>>(Messages.MaintenanceTime);
             }
-            return new SuccessDataResult<List<Product>>( _productDal.GetAll(), Messages.ProductsListed);
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(), Messages.ProductsListed);
         }
 
         public IDataResult<List<Product>> GetAllByCategoryId(int Id)
         {
-            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p=> p.CategoryId == Id));
+            return new SuccessDataResult<List<Product>>(_productDal.GetAll(p => p.CategoryId == Id));
         }
 
         public IDataResult<Product> GetById(int productId)
@@ -96,5 +129,47 @@ namespace Business.Concrete
             }
             return new SuccessDataResult<List<ProductDetailDto>>(_productDal.GetProductDetails());
         }
+        [ValidationAspect(typeof(ProductValidator))]
+        public IResult Update(Product product)
+        {
+            if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
+            {
+                //business kodlar
+                _productDal.Update(product); //productDal void kalmaya devam edecek
+                return new SuccessResult(Messages.ProductUpdated);//void yerine IResult yaptım artık return ile bir şey döndürebiliyoruz.
+            }
+            return new ErrorResult();
+        }
+        private IResult CheckIfProductCountOfCategoryCorrect(int categoryId)
+        {
+            var result = _productDal.GetAll(p => p.CategoryId == categoryId).Count;
+            if (result >= 15)
+            {
+                return new ErrorResult(Messages.ProductCountOfCategoryError);
+            }
+            return new SuccessResult();
+        }
+        private IResult CheckIfProductNameExists(string productName)//Aynı isimde ürün eklenemez
+        {
+            var result = _productDal.GetAll(p => p.ProductName == productName).Any();
+            if (result)
+            {
+                return new ErrorResult(Messages.ProductNameAlreadyExits);
+            }
+            return new SuccessResult();
+        }
+
+        //eğer mevcut kategori sayısı 15 i geçtiyse sisteme yeni ürün eklenemez.
+        private IResult CheckIfCategoryLimitExceeded()
+        {
+            var result = _categoryService.GetAll();
+            if (result.Data.Count >15)
+            {
+                return new ErrorResult(Messages.CategoryLimitExceeded);
+            }
+            return new SuccessResult();
+        }
+
+
     }
 }

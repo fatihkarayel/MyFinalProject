@@ -14,7 +14,8 @@ namespace Core.Aspects.Autofac.Validation
         private Type _validatorType;
         public ValidationAspect(Type validatorType)
         {
-            if (!typeof(IValidator).IsAssignableFrom(validatorType))
+            //defensive coding
+            if (!typeof(IValidator).IsAssignableFrom(validatorType)) //gönderdiğin Validator type bir IValidator mı?
             {
                 throw new System.Exception("Bu bir doğrulama sınıfı değil"); //AspectMessages.WrongValidationType
             }
@@ -23,7 +24,7 @@ namespace Core.Aspects.Autofac.Validation
         }
         protected override void OnBefore(IInvocation invocation)
         {
-            var validator = (IValidator)Activator.CreateInstance(_validatorType);
+            var validator = (IValidator)Activator.CreateInstance(_validatorType); //bu bir reflection codu. Çalışma anında instance oluşturur.
             var entityType = _validatorType.BaseType.GetGenericArguments()[0];
             var entities = invocation.Arguments.Where(t => t.GetType() == entityType);
             foreach (var entity in entities)
