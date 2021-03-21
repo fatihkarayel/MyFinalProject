@@ -44,6 +44,8 @@ namespace WebAPI
             services.AddControllers();
             //services.AddSingleton<IProductService,ProductManager>();//BANA ARKA PLANDA BÝR REFERANS OLUÞTUR DEMEK. Yani Apide IProductService görürse ProductManager i newliyor. bir tane Product Manager oluþturuyor. Bir milyon tane client bile gelse ayný instance i veriyor. Ama data tutanlarda yapýlmaz. Yani sepet de mesela .herkesin sepeti farklý biri sepetden bir ürün çýkarýrsa herkesden çýkar. veya biri eklerse hepsine eklenir gibi
             //services.AddSingleton<IProductDal, EfProductDal>(); //burada ProductManageri çalýtýrýrken karþýlaþtýðý baþka bir baðýmlýlýðý çözüyoruz.
+            services.AddCors(); //api de cors injectioný yapmak gerekiyor.
+
 
             var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
 
@@ -72,7 +74,9 @@ namespace WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+            app.ConfigureCustomExceptionMiddleware(); //tüm sistemi try catch içine alýyor. her yere tek tek yazmak yerine
+
+            app.UseCors(builder=>builder.WithOrigins("http://localhost:4200").AllowAnyHeader()); //buradaki sýrasý önemli en baþta olmalý. Bu adresden gelen isteklere güven diye yazýyoruz bunu.
 
             app.UseHttpsRedirection();
 

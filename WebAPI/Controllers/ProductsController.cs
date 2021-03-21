@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace WebAPI.Controllers
 {
@@ -29,6 +29,7 @@ namespace WebAPI.Controllers
         {
             //Swagger şeklinde dökümantasyonlar var
             //iyi kodda
+            //Thread.Sleep(5000); //test amaçlı kondu. sonra bunu sil
             var result = _productService.GetAll();
             if (result.Success)
             {
@@ -53,6 +54,17 @@ namespace WebAPI.Controllers
         public IActionResult GetById(int id)
         {
             var result = _productService.GetById(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);//result.Message da yapabilrdik
+        }
+
+        [HttpGet("getbycategory")]
+        public IActionResult GetByCategory(int categoryId)
+        {
+            var result = _productService.GetAllByCategoryId(categoryId);
             if (result.Success)
             {
                 return Ok(result);
