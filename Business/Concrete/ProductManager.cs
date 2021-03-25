@@ -42,7 +42,7 @@ namespace Business.Concrete
 
         }
 
-        //[SecuredOperation("product.add,admin")]// içine yazdıklarımıza claim diyoruz. bu metod için product.add ve admin yetkilerine sahip olması gerekir.
+        [SecuredOperation("product.add,admin")]// içine yazdıklarımıza claim diyoruz. bu metod için product.add ve admin yetkilerine sahip olması gerekir.
         [ValidationAspect(typeof(ProductValidator))]
         [CacheRemoveAspect("IProductService.Get")]
         public IResult Add(Product product)
